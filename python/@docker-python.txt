@@ -1,0 +1,301 @@
+
+docker WIN
+https://docs.docker.com/docker-for-windows/install/
+
+docker UBUNTU
+https://docs.docker.com/engine/install/ubuntu/
+
+docker DEBIAN
+https://docs.docker.com/engine/install/debian/
+
+docker MAC OS
+https://docs.docker.com/docker-for-mac/install/
+
+----------------------------------------
+[POWER SHELL] or [ANACONDA]
+
+cd 'C:\Program Files\Docker\Docker'
+
+OR DIRECTLY
+
+[CMD][CONDA]
+./DockerCli.exe -SwitchDaemon
+OR
+DockerCli.exe -SwitchDaemon
+
+THEN : DOCKER IS SWITCHING ..
+..DOCKER IS STARTING
+
+.............
+>test
+docker ps -a
+
+>Lista de IMAGENES
+docker images
+
+> Lista de contenedores 
+docker ps 
+
+.............
+
+> run python in docker container
+docker run --rm -it python:3 python
+	print("hello")
+
+D:\docker\python
+
+[LIN]
+docker run --rm -it -v $(pwd):/src python:3 python /src/hello.py
+
+[WIN]
+?
+
+
+docker run --rm -it -v pwd:/src python:3 python /src/hello.py
+docker run --rm -it -v pwd:/src python:3 python hello.py
+..python: can't open file '//hello.py': [Errno 2] No such file or directory
+
+docker run --rm -it python:3 python hello.py
+
+docker run --rm -it python:3 hello.py
+
+docker run --rm -it python:3 python "./hello.py"
+
+docker run --rm -it hello.py
+
+...............................
+
+D:\docker\python\cmd
+
+[!!!]
+hello.py
+Dockerfile
+
+docker build -t hello .
+docker run hello
+
+...............................
+
+D:\docker\python\cmd2
+
+[!!!]
+hello.py
+Dockerfile
+
+docker build -t hello .
+docker run hello
+
+...............................
+
+D:\docker\python\web
+
+docker build -t simple_nginx .
+
+docker run --rm -d -p 8080:80 simple_nginx
+
+docker ps 
+.
+CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                  NAMES
+050ffe1e8812   simple_nginx   "/docker-entrypoint.…"   8 seconds ago   Up 5 seconds   0.0.0.0:8080->80/tcp   stupefied_hellman
+.
+CONTAINER : stupefied_hellman
+IMAGES    : simple_nginx  [In use]
+
+localhost:8080
+
+
+==============================================
+
+(...?)
+
+FLASK
+
+Containerize a Python service
+https://www.docker.com/blog/containerized-python-development-part-1/
+
+
+docker build -t helloworld:latest
+docker run --rm -d -p 8000:8000 helloworld:latest
+
+
+D:\docker\python\Flask\app
+
+app
+├─── requirements.txt
+└─── src
+     └─── server.py
+
+==============================================
+
+[!]
+FLASK
+
+
+https://runnable.com/docker/python/dockerize-your-flask-application
+
+docker build -t flask-tutorial:latest .
+
+docker run -d -p 5000:5000 flask-tutorial
+
+docker ps 
+
+
+localhost:5000
+localhost:5000/
+
+
+==============================================
+
+Django
+
+> Docker python django tutorial. Dockerize a Python django App
+https://dockerize.io/guides/python-django-guide
+
+python --version
+
+mkdir tutotial
+cd tutorial
+
+# python3 -m venv <name>
+# python3 -m venv myenvpy
+
+# activate myenvpy
+
+[new]
+requirements.txt
+Django==2.2.5
+
+# pip install -r requirements.txt
+
+django-admin startproject mysite
+
+[tutotial]
+.
+├── mysite
+│   ├── mysite
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   └── manage.py
+└── requirements.txt
+
+cd mysite
+
+python manage.py runserver
+
+# Starting development server at http://127.0.0.1:8000/
+
+http://127.0.0.1:8000/
+
+python manage.py startapp hello_world
+
+__init__.py tells Python to treat the directory as a Python package.
+admin.py contains settings for the Django admin pages.
+apps.py contains settings for the application configuration.
+models.py contains a series of classes that Django’s ORM converts to database tables.
+tests.py contains test classes.
+views.py contains functions and classes that handle what data is displayed in the HTML templates.
+
+mysite/settings.py
+    'hello_world',  # <-- ADDED 
+	
+hello_world/views.py
+# ADDED 2 lines
+def hello_world(request): 
+    return render(request, 'hello_world.html', {})
+
+cd hello_world
+
+mkdir templates
+
+mysite/hello_world/templates
+hello_world.html
+
+<h1>Hello, World!, Hola Mundo, Ciao Mondo, Bonjour Monde .. Django</h1>
+
+mysite/urls.py
+
+from django.urls include	# <--  ADDED
+
+	path('', include('hello_world.urls')),   # <--  ADDED
+
+[new]
+hello_world/urls.py
+
+from django.urls import path
+from hello_world import views
+
+urlpatterns = [
+    path('', views.hello_world, name='hello_world'),
+]
+
+
+
+python manage.py runserver
+
+http://127.0.0.1:8000/
+
+
+tutotial
+[new]
+Dockerfile
+
+.............
+
+# Dockerfile
+
+# The first instruction is what image we want to base our container on
+# We Use an official Python runtime as a parent image
+FROM python:3.7
+
+# Allows docker to cache installed dependencies between builds
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Mounts the application code to the image
+COPY . code
+WORKDIR /code
+
+EXPOSE 8000
+
+# runs the production server
+ENTRYPOINT ["python", "mysite/manage.py"]
+CMD ["runserver", "0.0.0.0:8000"]
+
+.............
+
+Building and Running the Container
+
+docker build -t python-django-app .
+
+
+run the container 
+
+docker run -it -p 8000:8000 python-django-app
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
+> Django, Docker, and PostgreSQL Tutorial
+https://learndjango.com/tutorials/django-docker-and-postgresql-tutorial
+
+Image: the "definition" of your project
+Container: what your project actually runs in (an instance of the image)
+Dockerfile: defines what your image looks like
+docker-compose.yml: a YAML file that takes the Dockerfile and adds additional instructions for how our Docker container should behave in production
+
+
+> big - docker-django-example
+https://github.com/nickjj/docker-django-example
+
+==============================================
+
+
+
+
+
+
+
+
+
+
